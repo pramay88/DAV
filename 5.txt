@@ -1,0 +1,31 @@
+import requests
+import json
+import schedule
+import time
+
+def fetch_weather(city="London"):
+    API_KEY = "f29a0a07a8c939e1176d3589f168386d"  # Your API key
+    url = f"https://api.openweathermap.org/data/2.5/weather?q={city}&appid={API_KEY}&units=metric"
+    response = requests.get(url)
+    if response.status_code == 200:
+        data = response.json()
+        return {
+            "City": city,
+            "Temperature": data["main"]["temp"],
+            "Humidity": data["main"]["humidity"],
+            "Weather": data["weather"][0]["description"]
+        }
+    return None
+
+def automate_fetching():
+    weather_data = fetch_weather()
+    if weather_data:
+        print(weather_data)
+    else:
+        print("Failed to fetch data.")
+
+schedule.every(1).hours.do(automate_fetching)
+
+while True:
+    schedule.run_pending()
+    time.sleep(1)
