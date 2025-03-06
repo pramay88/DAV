@@ -1,0 +1,90 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+
+##
+# Load the dataset
+df = pd.read_csv("Amazon Sale Report.csv", low_memory=False)
+
+# Check for null values
+print(df.isnull().sum())
+
+# Replace null values with 0
+df.fillna(0, inplace=True)
+
+# Save the cleaned dataset
+df.to_csv("Cleaned_Amazon_Sale_Report.csv", index=False)
+
+
+## Total spend by each customer
+customer_analysis = df.groupby('Order ID')['Amount'].sum().sort_values(ascending=False)
+
+print("Top 5 Customers by Total Spend:")
+print(customer_analysis.head())
+
+# Purchase frequency
+customer_frequency = df['Order ID'].value_counts()
+
+print("\nTop 5 Customers by Purchase Frequency:")
+print(customer_frequency.head())
+
+## Total sales by product category
+product_sales = df.groupby('Category')['Amount'].sum().sort_values(ascending=False)
+
+print("\nTop 5 Product Categories by Sales:")
+print(product_sales.head())
+
+# Visualizing product performance
+top_products = product_sales.head()
+
+plt.figure(figsize=(5, 3))
+top_products.plot(kind='bar', color='skyblue')
+
+plt.title("Top 5 Product Categories by Sales")
+plt.xlabel("Category")
+plt.ylabel("Total Sales")
+plt.xticks(rotation=45)
+
+plt.show()
+
+## Convert the 'Date' column to datetime format
+df['Date'] = pd.to_datetime(df['Date'], errors='coerce')
+
+# Extract the month and year as a period
+df['Month'] = df['Date'].dt.to_period('M')
+
+# Calculate monthly sales
+monthly_sales = df.groupby('Month')['Amount'].sum()
+
+# Plotting monthly sales
+plt.figure(figsize=(10, 6))
+monthly_sales.plot(kind='line', marker='o')
+
+plt.title("Monthly Sales Trend")
+plt.xlabel("Month")
+plt.ylabel("Total Sales")
+plt.grid(True)
+plt.xticks(rotation=45)
+
+plt.show()
+
+## Sales by region
+region_sales = df.groupby('ship-state')['Amount'].sum().sort_values(ascending=False)
+
+print("\nSales by Region:")
+print(region_sales)
+
+# Visualizing regional sales
+plt.figure(figsize=(5, 3))
+region_sales.plot(kind='pie', autopct='%1.1f%%', startangle=90, colors=['skyblue', 'orange', 'lightgreen'])
+
+plt.title("Sales Distribution by Region")
+plt.ylabel("")  # Hides y-label
+
+plt.show()
+
+# Insights
+print("\nInsights:")
+print("- Top customers contribute significantly to total revenue. Target them with loyalty programs.")
+print("- High-performing products dominate sales. Consider increasing inventory for these products.")
+print("- Seasonal trends indicate peak sales during certain months. Optimize marketing during these periods.")
+print("- Regions with lower sales could benefit from targeted campaigns.")
