@@ -1,0 +1,70 @@
+import pandas as pd 
+import numpy as np 
+import matplotlib.pyplot as plt 
+import seaborn as sns 
+from scipy.stats import skew, kurtosis 
+# Load the dataset (replace 'data.csv' with your dataset file) 
+dataset_path = "Heart.csv" 
+data = pd.read_csv(dataset_path) 
+# Display first few rows of the dataset 
+print("First 5 rows of the dataset:") 
+print(data.head()) 
+# Descriptive statistics 
+print("\nDescriptive Statistics:") 
+print(data.describe()) 
+# Calculate additional statistics 
+for column in data.select_dtypes(include=np.number).columns: 
+    print(f"\nStatistics for {column}:") 
+    print(f"Mean: {data[column].mean()}") 
+    print(f"Median: {data[column].median()}") 
+    print(f"Variance: {data[column].var()}") 
+    print(f"Standard Deviation: {data[column].std()}") 
+    print(f"Skewness: {skew(data[column])}") 
+    print(f"Kurtosis: {kurtosis(data[column])}") 
+# Correlation matrix 
+print("\nCorrelation Matrix:") 
+# Select only numeric columns for correlation computation 
+numeric_data = data.select_dtypes(include=np.number) 
+correlation_matrix = numeric_data.corr() 
+print(correlation_matrix) 
+# Heatmap of the correlation matrix 
+plt.figure(figsize=(10, 8)) 
+sns.heatmap(correlation_matrix, annot=True, cmap="coolwarm", fmt=".2f") 
+plt.title("Correlation Matrix Heatmap") 
+plt.show() 
+# Visualization 
+columns_to_plot = data.select_dtypes(include=np.number).columns 
+# Line plot 
+plt.figure(figsize=(10, 6)) 
+for column in columns_to_plot: 
+    plt.plot(data.index, data[column], label=column) 
+    plt.title("Line Plot") 
+    plt.xlabel("Index") 
+    plt.ylabel("Values") 
+    plt.legend() 
+    plt.grid() 
+    plt.show() 
+# Bar plot (mean values) 
+means = data[columns_to_plot].mean() 
+means.plot(kind='bar', color='skyblue', figsize=(8, 6)) 
+plt.title("Bar Plot of Mean Values") 
+plt.xlabel("Columns") 
+plt.ylabel("Mean") 
+plt.show() 
+# Histogram 
+for column in columns_to_plot: 
+    plt.figure(figsize=(8, 6)) 
+    plt.hist(data[column], bins=15, color='orange', edgecolor='black') 
+    plt.title(f"Histogram of {column}") 
+    plt.xlabel(column) 
+    plt.ylabel("Frequency") 
+    plt.show() 
+# Scatter plot (first two numerical columns) 
+if len(columns_to_plot) >= 2: 
+    plt.figure(figsize=(8, 6)) 
+    plt.scatter(data[columns_to_plot[0]], data[columns_to_plot[1]], color='green', alpha=0.6) 
+    plt.title(f"Scatter Plot of {columns_to_plot[0]} vs {columns_to_plot[1]}") 
+    plt.xlabel(columns_to_plot[0]) 
+    plt.ylabel(columns_to_plot[1]) 
+    plt.grid() 
+    plt.show()
