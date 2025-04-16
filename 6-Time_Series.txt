@@ -1,0 +1,17 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+from statsmodels.tsa.seasonal import seasonal_decompose
+
+df = pd.read_csv("DailyDelhiClimateTest.csv", parse_dates=["date"], index_col="date")
+
+df["Moving_Avg"] = df["meantemp"].rolling(window=5).mean() 
+plt.plot(df["meantemp"], label="Original Data") 
+plt.plot(df["Moving_Avg"], label="Moving Average", linestyle="dashed") 
+plt.legend()
+plt.xticks(rotation=45)
+plt.show()
+
+decomposition = seasonal_decompose(df["meantemp"], model="additive", period=12) 
+decomposition.plot()
+plt.xticks(rotation=45)
+plt.show()
