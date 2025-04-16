@@ -1,0 +1,50 @@
+!pip install schedule
+import requests
+import schedule
+import time
+
+# Your API key (no environment variable)
+API_KEY = "f29a0a07a8c939e1176d3589f168386d"  # your actual API key
+
+def fetch_weather(city="London"):
+    """Fetch weather data from OpenWeather API."""
+    url = f"https://api.openweathermap.org/data/2.5/weather?q={city}&appid={API_KEY}&units=metric"
+    
+    try:
+        # Sending the request to the OpenWeather API
+        response = requests.get(url)
+        # Check if the response was successful (HTTP Status Code 200)
+        response.raise_for_status()
+        
+        # If successful, parse the JSON response
+        data = response.json()
+        
+        # Return a dictionary with weather information
+        return {
+            "City": city,
+            "Temperature": data["main"]["temp"],
+            "Humidity": data["main"]["humidity"],
+            "Weather": data["weather"][0]["description"]
+        }
+    except requests.exceptions.RequestException as e:
+        print(f"Error fetching weather data: {e}")
+        return None  # Return None in case of any error
+
+def automate_fetching():
+    """Fetch and print the weather data."""
+    weather_data = fetch_weather()
+    if weather_data:
+        print(f"Weather data for {weather_data['City']}:")
+        print(f"Temperature: {weather_data['Temperature']}°C")
+        print(f"Humidity: {weather_data['Humidity']}%")
+        print(f"Weather: {weather_data['Weather']}")
+    else:
+        print("Failed to fetch weather data.")
+
+# Schedule the weather fetching function to run every minute
+schedule.every(1).minutes.do(automate_fetching)
+
+# Keep the program running indefinitely to trigger the scheduled tasks
+while True:
+    schedule.run_pending()
+    time.sleep(1)
